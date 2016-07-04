@@ -8,7 +8,9 @@
     "emitDecoratorMetadata":true,
     "experimentalDecorators":true,
     "noEmitOnError":true,
-    "moduleResolution":"node"
+    "moduleResolution":"node",
+    "jsx": "react",
+    "reactNamespace":"rama"
   },
   "exclude": [
     "node_modules"

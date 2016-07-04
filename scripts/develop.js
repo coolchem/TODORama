@@ -13,7 +13,7 @@ util.exec("npm run build",function(){
 
     serve();
 
-    myWatch(["src/**/*.html","src/**/*.scss","src/**/*.ts"],function(filePath){
+    myWatch(["src/**/*.html","src/**/*.scss","src/**/*.ts","src/**/*.tsx"],function(filePath){
         util.exec("npm run build",function(err){
             if(!err)
             {

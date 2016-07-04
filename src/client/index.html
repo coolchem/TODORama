@@ -5,17 +5,23 @@
     <title>My Title</title>
 
     <!-- @if BUILD='release' !>
-        <link rel="stylesheet" type="text/css" href="systems/view_system/styles/main.css">
+         <link rel="stylesheet" type="text/css" href="systems/view_system/styles/vendor/base.css">
+        <link rel="stylesheet" type="text/css" href="lib/css/index.css">
+        <link rel="stylesheet" type="text/css" href="lib/css/main.css">
     <!-- @endif !>
 
     <!-- @exclude -->
-        <link rel="stylesheet" type="text/css" href="../../src/client/systems/view_system/styles/main.css">
+    <link rel="stylesheet" type="text/css" href="../../src/client/lib/css/base.css">
+    <link rel="stylesheet" type="text/css" href="../../src/client/lib/css/index.css">
+    <link rel="stylesheet" type="text/css" href="../../src/client/systems/view_system/styles/main.css">
     <!-- @endexclude -->
 
 </head>
 <body>
 
-<div id="app"><h1>Hello World!!!</h1></div>
+<div id="app">
+
+</div>
 <!-- @if BUILD='release' !>
     <script src="main.js"></script>
 <!-- @endif !>
