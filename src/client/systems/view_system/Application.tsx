@@ -10,18 +10,7 @@ export class Application extends View
     toggleAllCheckBox:DOMElement;
     newTODOInput:DOMElement;
 
-    todoCollection:ArrayCollection<any> = new ArrayCollection([
-        {
-            label:"Taste JavaScript",
-            completed:true,
-            deleted:false
-        },
-        {
-            label:"Buy a unicorn",
-            completed:false,
-            deleted:false
-        }
-    ]);
+    todoCollection:ArrayCollection<any>;
 
 
     constructor() {
@@ -33,7 +22,13 @@ export class Application extends View
             window.location.hash = "#/"
         }
 
-        this.validateState();
+        var items:Array<any>;
+
+        if (window.localStorage) {
+            items = JSON.parse(window.localStorage.getItem('todos-rama')) || [];
+        }
+
+        this.todoCollection = new ArrayCollection(items);
 
         window.onhashchange = ()=>{
             this.handleHashChange()
@@ -45,6 +40,13 @@ export class Application extends View
         };
 
         this.handleHashChange();
+
+    }
+
+    private updateLocalStorage(){
+
+        if (window.localStorage)
+            window.localStorage.setItem('todos-rama', JSON.stringify(this.todoCollection.getSource()));
 
     }
 
@@ -122,11 +124,13 @@ export class Application extends View
 
                     this.todoCollection.addItem(newTODO);
                     (this.newTODOInput.getElementRef() as HTMLInputElement).value = "";
+
+                    this.updateLocalStorage();
                 }
             }
 
         });
-        
+
         this.todoCollection.refresh();
     }
 
