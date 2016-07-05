@@ -125,7 +125,9 @@ export class Application extends View
                 }
             }
 
-        })
+        });
+        
+        this.todoCollection.refresh();
     }
 
     render() {
