@@ -1,13 +1,35 @@
 
-import {View,rama,render} from "ramajs"
+
+import {DOMElement} from "ramajs/dist/core/DOMElement";
+import {TODODataGroup, TODOItemRenderer} from  "./systems/view_system/TODODataGroup";
+require("todomvc-common");
+
+import {View, rama, render, ArrayCollection} from "ramajs"
 
 class Application extends View
 {
 
+    toggleAllCheckBox:DOMElement;
+
+
+    todoCollection:ArrayCollection<any> = new ArrayCollection([
+        {
+            label:"Taste JavaScript",
+            completed:true,
+            deleted:false
+        },
+        {
+            label:"Buy a unicorn",
+            completed:false,
+            deleted:false
+        }
+    ]);
+
     attached():void {
-        super.attached();
-        console.log("I was here");
-        this.setCurrentState("testState");
+
+        this.toggleAllCheckBox.addEventListener("change", (event:Event)=>{
+            console.log(event)
+        })
     }
 
     render() {
@@ -21,27 +43,9 @@ class Application extends View
                     <input class="new-todo" placeholder="What needs to be done?" autofocus/>
                 </header>
                 <section class="main">
-                    <input class="toggle-all" type="checkbox"/>
+                    <input id="toggleAllCheckBox" class="toggle-all" type="checkbox"/>
                         <label for="toggle-all">Mark all as complete</label>
-                        <ul class="todo-list">
-                            <li class="completed">
-                                <div class="view">
-                                    <input class="toggle" type="checkbox" checked/>
-                                    <label>Taste JavaScript</label>
-                                    <button class="destroy"/>
-                                </div>
-                                <input class="edit" value="Create a TodoMVC template"/>
-                            </li>
-                            <li>
-                                <div class="view">
-                                    <input class="toggle" type="checkbox"/>
-                                    <label>Buy a unicorn</label>
-                                    <button class="destroy"/>
-                                </div>
-                                <input class="edit" value="Rule the web"/>
-                            </li>
-                        </ul>
-
+                        <TODODataGroup class="todo-list" itemRenderer={TODOItemRenderer} dataProvider={this.todoCollection}/>
                 </section>
                 <footer class="footer">
                     <span class="todo-count"><strong>0</strong> item left</span>
