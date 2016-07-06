@@ -116,14 +116,14 @@ export class Application extends View
             var keyCode:number = event.keyCode || event.which;
             if (keyCode == 13){
                 // Enter pressed
-                var todoText = (this.newTODOInput.getElementRef() as HTMLInputElement).value;
+                var todoText = (this.newTODOInput[0] as HTMLInputElement).value;
 
                 if(todoText)
                 {
                     var newTODO:any = {label:todoText,completed:false,deleted:false};
 
                     this.todoCollection.addItem(newTODO);
-                    (this.newTODOInput.getElementRef() as HTMLInputElement).value = "";
+                    (this.newTODOInput[0] as HTMLInputElement).value = "";
 
                     this.updateLocalStorage();
                 }
@@ -133,6 +133,16 @@ export class Application extends View
 
         this.todoCollection.refresh();
     }
+
+    private todoItemDeleted = (event:Event)=>{
+        this.todoCollection.refresh();
+        this.updateLocalStorage();
+    };
+
+    private todoItemUpdated = (event:Event)=>{
+        this.todoCollection.refresh();
+        this.updateLocalStorage();
+    };
 
     render() {
         return <div>
@@ -148,8 +158,10 @@ export class Application extends View
                 </header>
                 <section class="main">
                     <input id="toggleAllCheckBox" class="toggle-all" type="checkbox"/>
+
                     <label for="toggle-all">Mark all as complete</label>
-                    <TODODataGroup class="todo-list" itemRenderer={TODOItemRenderer} dataProvider={this.todoCollection}/>
+
+                    <TODODataGroup todoItemUpdated={this.todoItemUpdated} todoItemDeleted={this.todoItemDeleted} class="todo-list" itemRenderer={TODOItemRenderer} dataProvider={this.todoCollection}/>
                 </section>
                 <footer class="footer">
                     <span class="todo-count"><strong>0</strong> item left</span>

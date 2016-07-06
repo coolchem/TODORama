@@ -1,8 +1,9 @@
 
 
 import {DataGroup} from "ramajs/dist/DataGroup";
-import {View,rama} from "ramajs/dist/index";
+import {View, rama, event} from "ramajs/dist/index";
 import {DOMElement} from "ramajs/dist/core/DOMElement";
+import {REventInit} from "ramajs/dist/core/event";
 
 
 export class TODOItemRenderer extends View
@@ -24,8 +25,9 @@ export class TODOItemRenderer extends View
         this.updateItemRenderer();
 
         this.completedCheckBox.addEventListener("change",(event:Event)=>{
-            this._data.completed =  (this.completedCheckBox.getElementRef() as HTMLInputElement).checked;
+            this._data.completed =  (this.completedCheckBox[0] as HTMLInputElement).checked;
             this.updateItemRenderer();
+            this.dispatchEvent(new CustomEvent("todoItemUpdated", new REventInit<any>(true,false,this._data)))
         })
 
     }
@@ -35,11 +37,11 @@ export class TODOItemRenderer extends View
         if(this._data)
         {
             if(this.todoLabel)
-                (this.todoLabel.getElementRef() as HTMLLabelElement).textContent = this._data.label;
+                (this.todoLabel[0] as HTMLLabelElement).textContent = this._data.label;
 
             if(this.completedCheckBox)
             {
-                (this.completedCheckBox.getElementRef() as HTMLInputElement).checked = this._data.completed;
+                (this.completedCheckBox[0] as HTMLInputElement).checked = this._data.completed;
             }
 
             if(this._data.completed)
@@ -52,6 +54,12 @@ export class TODOItemRenderer extends View
             }
         }
     }
+    
+    private deleteItem():void
+    {
+        this._data.deleted = true;
+        this.dispatchEvent(new CustomEvent("todoItemDeleted", new REventInit<any>(true,false,this._data)))
+    }
 
     render():any {
         return <li class__completed="completed">
@@ -62,13 +70,15 @@ export class TODOItemRenderer extends View
             <div class="view">
                 <input id="completedCheckBox" class="toggle" type="checkbox"/>
                 <label id="todoLabel"/>
-                <button class="destroy"/>
+                <button class="destroy" onclick={(event:MouseEvent)=>{this.deleteItem()}}/>
             </div>
             <input class="edit" value="Create a TodoMVC template"/>
         </li>
     }
 }
 
+@event("todoItemUpdated")
+@event("todoItemDeleted")
 export class TODODataGroup extends DataGroup
 {
 
