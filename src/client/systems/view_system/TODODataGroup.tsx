@@ -5,6 +5,8 @@ import {View, rama, event} from "ramajs/dist/index";
 import {DOMElement} from "ramajs/dist/core/DOMElement";
 import {REventInit} from "ramajs/dist/core/event";
 
+const ENTER_KEY = 13;
+const ESCAPE_KEY = 27;
 
 export class TODOItemRenderer extends View
 {
@@ -12,6 +14,7 @@ export class TODOItemRenderer extends View
     private _data:any;
     todoLabel:DOMElement;
     completedCheckBox:DOMElement;
+    editTODOInput:DOMElement;
 
     setData(data:any):void
     {
@@ -29,6 +32,8 @@ export class TODOItemRenderer extends View
             this.updateItemRenderer();
             this.dispatchEvent(new CustomEvent("todoItemUpdated", new REventInit<any>(true,false,this._data)))
         })
+
+        window.document.addEventListener("click", this.handleDocumentMouseClick)
 
     }
 
@@ -61,18 +66,64 @@ export class TODOItemRenderer extends View
         this.dispatchEvent(new CustomEvent("todoItemDeleted", new REventInit<any>(true,false,this._data)))
     }
 
+    private handleDocumentMouseClick = (event:MouseEvent)=>{
+
+        if(!(event.target == this[0]) && !(event.target == this.editTODOInput[0]) && this.getCurrentState() == "editing")
+        {
+
+            this.todoLabelUpdated();
+        }
+    };
+
+    private handleDoubleClick = (event:Event)=>{
+
+        if(!this._data.completed)
+        {
+            this.setCurrentState("editing");
+            this.editTODOInput[0].value = this._data.label;
+            (this.editTODOInput[0] as HTMLElement).focus();
+        }
+    };
+
+    private handleKyePress = (event:KeyboardEvent)=>{
+
+        if(this.getCurrentState() == "editing")
+        {
+            var keyCode:number = event.keyCode || event.which;
+
+            if (keyCode == ENTER_KEY){
+                this.todoLabelUpdated();
+                return;
+            }
+
+            if(keyCode == ESCAPE_KEY)
+            {
+                this.setCurrentState("");
+            }
+        }
+
+    };
+
+    private todoLabelUpdated():void
+    {
+        this._data.label = this.editTODOInput[0].value;
+        this.dispatchEvent(new CustomEvent("todoItemUpdated", new REventInit<any>(true,false,this._data)));
+        this.setCurrentState("");
+    }
+
     render():any {
-        return <li class__completed="completed">
+        return <li class__completed="completed" ondblclick={this.handleDoubleClick}>
 
             <states>
                 <state name="completed"/>
+                <state name="editing"/>
             </states>
-            <div class="view">
+            <div class="view" style__editing="display:none">
                 <input id="completedCheckBox" class="toggle" type="checkbox"/>
                 <label id="todoLabel"/>
                 <button class="destroy" onclick={(event:MouseEvent)=>{this.deleteItem()}}/>
             </div>
-            <input class="edit" value="Create a TodoMVC template"/>
+            <input id="editTODOInput" onkeydown={this.handleKyePress} style__editing="display:block" class="edit"/>
         </li>
     }
 }
