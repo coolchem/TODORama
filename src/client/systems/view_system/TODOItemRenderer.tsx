@@ -1,9 +1,7 @@
-
-
-import {DataGroup} from "ramajs/dist/DataGroup";
 import {View, rama, event} from "ramajs/dist/index";
 import {DOMElement} from "ramajs/dist/core/DOMElement";
-import {REventInit} from "ramajs/dist/core/event";
+import {TODOItemEventInit} from "./events/TODOItemEvent";
+import {TODOItem} from "../service_system/models/TODOItem";
 
 const ENTER_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -11,7 +9,9 @@ const ESCAPE_KEY = 27;
 export class TODOItemRenderer extends View
 {
 
-    private _data:any;
+    private _data:TODOItem;
+    
+    
     todoLabel:DOMElement;
     completedCheckBox:DOMElement;
     editTODOInput:DOMElement;
@@ -23,18 +23,10 @@ export class TODOItemRenderer extends View
     }
 
 
-    attached():void {
-        super.attached();
+    initialized():void {
+        this.completedCheckBox.addEventListener("change",this.handleCompletedCheckBoxChange);
+        window.document.addEventListener("click", this.handleDocumentMouseClick);
         this.updateItemRenderer();
-
-        this.completedCheckBox.addEventListener("change",(event:Event)=>{
-            this._data.completed =  (this.completedCheckBox[0] as HTMLInputElement).checked;
-            this.updateItemRenderer();
-            this.dispatchEvent(new CustomEvent("todoItemUpdated", new REventInit<any>(true,false,this._data)))
-        })
-
-        window.document.addEventListener("click", this.handleDocumentMouseClick)
-
     }
 
     protected updateItemRenderer():void
@@ -59,18 +51,21 @@ export class TODOItemRenderer extends View
             }
         }
     }
-    
-    private deleteItem():void
+
+    private handleDeleteItem = (event:MouseEvent):void=>
     {
-        this._data.deleted = true;
-        this.dispatchEvent(new CustomEvent("todoItemDeleted", new REventInit<any>(true,false,this._data)))
-    }
+        this.dispatchEvent(new CustomEvent(TODOItemEventInit.TODO_ITEM_DELETED, new TODOItemEventInit({item:this._data})));
+    };
+
+    private handleCompletedCheckBoxChange = (event:Event)=>{
+        
+        this.dispatchEvent(new CustomEvent(TODOItemEventInit.TODO_ITEM_TOGGLE_COMPLETED, new TODOItemEventInit({item:this._data,value:(this.completedCheckBox[0] as HTMLInputElement).checked})))
+    };
 
     private handleDocumentMouseClick = (event:MouseEvent)=>{
 
         if(!(event.target == this[0]) && !(event.target == this.editTODOInput[0]) && this.getCurrentState() == "editing")
         {
-
             this.todoLabelUpdated();
         }
     };
@@ -106,8 +101,7 @@ export class TODOItemRenderer extends View
 
     private todoLabelUpdated():void
     {
-        this._data.label = this.editTODOInput[0].value;
-        this.dispatchEvent(new CustomEvent("todoItemUpdated", new REventInit<any>(true,false,this._data)));
+        this.dispatchEvent(new CustomEvent(TODOItemEventInit.TODO_ITEM_EDITED, new TODOItemEventInit({item:this._data,value:this.editTODOInput[0].value})));
         this.setCurrentState("");
     }
 
@@ -121,19 +115,9 @@ export class TODOItemRenderer extends View
             <div class="view" style__editing="display:none">
                 <input id="completedCheckBox" class="toggle" type="checkbox"/>
                 <label id="todoLabel"/>
-                <button class="destroy" onclick={(event:MouseEvent)=>{this.deleteItem()}}/>
+                <button class="destroy" onclick={this.handleDeleteItem}/>
             </div>
             <input id="editTODOInput" onkeydown={this.handleKyePress} style__editing="display:block" class="edit"/>
         </li>
-    }
-}
-
-@event("todoItemUpdated")
-@event("todoItemDeleted")
-export class TODODataGroup extends DataGroup
-{
-
-    constructor() {
-        super("ul");
     }
 }

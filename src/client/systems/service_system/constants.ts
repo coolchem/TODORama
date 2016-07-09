@@ -1,0 +1,13 @@
+
+
+export const ActionConstants = {
+    TODOS_LOADED:"TODOS_LOADED",
+    TODOS_FILTER_CHANGED:"TODOS_FILTER_CHANGED",
+    TODOS_SAVED:"TODOS_SAVED"
+};
+
+
+export const EventConstants = {
+    TODOS_LOADED:"TODOS_LOADED",
+    TODOS_CHANGED:"TODOS_CHANGED"
+};

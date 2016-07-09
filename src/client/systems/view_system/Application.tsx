@@ -1,18 +1,25 @@
 
 
-import {View, rama,ArrayCollection} from "ramajs"
+import {View, rama} from "ramajs"
 import {DOMElement} from "ramajs/dist/core/DOMElement";
-import {TODOItemRenderer,TODODataGroup} from "./TODODataGroup";
+import {TODODataGroup} from "./TODODataGroup";
+import {TODOItemRenderer} from "./TODOItemRenderer";
+
+import {todoStore} from "../service_system/stores/index";
+import {
+    loadTODOs, applyTOODsFilter, addTODO, deleteTODO, editTODOItem,
+    toggleTODOItemCompleted
+} from "../service_system/managers/todo-manager";
+import {EventConstants} from "../service_system/constants";
+import {TODOItem} from "../service_system/models/TODOItem";
+
 
 export class Application extends View
 {
 
     toggleAllCheckBox:DOMElement;
     newTODOInput:DOMElement;
-
-    todoCollection:ArrayCollection<any>;
-
-
+    
     constructor() {
 
         super();
@@ -22,63 +29,24 @@ export class Application extends View
             window.location.hash = "#/"
         }
 
-        var items:Array<any>;
-
-        if (window.localStorage) {
-            items = JSON.parse(window.localStorage.getItem('todos-rama')) || [];
-        }
-
-        this.todoCollection = new ArrayCollection(items);
-
         window.onhashchange = ()=>{
             this.handleHashChange()
         };
-
-
-        this.todoCollection.filterFunction = (item:any)=>{
-            return this.todoFilter(item);
-        };
-
-        this.handleHashChange();
-
+        
+        loadTODOs();
+        
+        todoStore.addEventListener(EventConstants.TODOS_LOADED,()=>{
+            this.handleHashChange();   
+        })
     }
-
-    private updateLocalStorage(){
-
-        if (window.localStorage)
-            window.localStorage.setItem('todos-rama', JSON.stringify(this.todoCollection.getSource()));
-
-    }
-
-    private todoFilter(item:any):boolean
-    {
-        var currentState = this.getCurrentState();
-
-        if(item.deleted)
-            return false;
-
-
-        if(currentState == "active")
-        {
-            return !item.completed;
-        }
-
-        if(currentState == "completed")
-        {
-            return item.completed;
-        }
-
-        return true;
-
-    }
+    
 
     private handleHashChange():void
     {
         var state:string = "";
         switch(window.location.hash)
         {
-
-
+            
             case "#/" :
             {
                 state =  "all";
@@ -100,8 +68,7 @@ export class Application extends View
         }
 
         this.setCurrentState(state);
-
-        this.todoCollection.refresh();
+        applyTOODsFilter(state);
 
     }
 
@@ -120,28 +87,30 @@ export class Application extends View
 
                 if(todoText)
                 {
-                    var newTODO:any = {label:todoText,completed:false,deleted:false};
-
-                    this.todoCollection.addItem(newTODO);
+                    addTODO(todoText);
                     (this.newTODOInput[0] as HTMLInputElement).value = "";
-
-                    this.updateLocalStorage();
                 }
             }
 
         });
-
-        this.todoCollection.refresh();
+        
     }
 
-    private todoItemDeleted = (event:Event)=>{
-        this.todoCollection.refresh();
-        this.updateLocalStorage();
+    private todoItemDeleted = (event:CustomEvent)=>{
+
+        var eventDetail:{item:TODOItem, value?:any} = event.detail;
+        deleteTODO(eventDetail.item);
+        
     };
 
-    private todoItemUpdated = (event:Event)=>{
-        this.todoCollection.refresh();
-        this.updateLocalStorage();
+    private todoItemEdited = (event:CustomEvent)=>{
+        var eventDetail:{item:TODOItem, value?:any} = event.detail;
+        editTODOItem(eventDetail.item,eventDetail.value);
+    };
+
+    private todoItemToggleCompleted = (event:CustomEvent)=>{
+        var eventDetail:{item:TODOItem, value?:any} = event.detail;
+        toggleTODOItemCompleted(eventDetail.item,eventDetail.value);
     };
 
     render() {
@@ -161,7 +130,11 @@ export class Application extends View
 
                     <label for="toggle-all">Mark all as complete</label>
 
-                    <TODODataGroup todoItemUpdated={this.todoItemUpdated} todoItemDeleted={this.todoItemDeleted} class="todo-list" itemRenderer={TODOItemRenderer} dataProvider={this.todoCollection}/>
+                    <TODODataGroup todoItemEdited={this.todoItemEdited}
+                                   todoItemToggleCompleted={this.todoItemToggleCompleted}
+                                   todoItemDeleted={this.todoItemDeleted} class="todo-list" 
+                                   itemRenderer={TODOItemRenderer} 
+                                   dataProvider={todoStore.todos}/>
                 </section>
                 <footer class="footer">
                     <span class="todo-count"><strong>0</strong> item left</span>

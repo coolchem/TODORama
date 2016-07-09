@@ -18,7 +18,7 @@
     "bluebird": "3.4.1",
     "connect": "3.4.1",
     "eventemitter3": "1.2.0",
-    "ramajs": "^0.3.1",
+    "ramajs": "^0.3.2",
     "serve-static": "1.11.1",
     "todomvc-app-css": "^2.0.6",
     "todomvc-common": "^1.0.2"
