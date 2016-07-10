@@ -84,6 +84,9 @@ export class Application extends View
             this.clearCompletedBtn[0].style.display = '';
         else
             this.clearCompletedBtn[0].style.display = 'none';
+
+        if(this.toggleAllCheckBox)
+            this.toggleAllCheckBox[0].checked = todoStore.itemsLeftToComplete == 0;
     };
 
     private handleHashChange():void
