@@ -70,7 +70,7 @@ function buildTypescript(cb,isRelease){
     var cmd = "tsc";
 
     if(!isRelease)
-        cmd = cmd + " --inlineSourceMap --inlineSources";
+        cmd = cmd;
 
     util.exec(cmd, function (err) {
 
