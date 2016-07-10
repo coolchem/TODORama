@@ -48,6 +48,31 @@ export function toggleTODOItemCompleted(item:TODOItem, completed:boolean):void
     saveTODOItems();
 }
 
+export function toggleAllItemCompleted(value:boolean):void
+{
+    var todos:ArrayCollection<TODOItem> = todoStore.todos;
+    
+    todos.forEach((todo:TODOItem)=>{
+        todo.completed = value;
+    },null);
+
+    saveTODOItems()
+}
+
+export function clearAllCompleted():void
+{
+    for (var i=todoStore.todos.length-1; i>=0; i--)
+    {
+        var todo:TODOItem = todoStore.todos.getItemAt(i);
+        if(todo.completed)
+        {
+            todo.deleted = true;
+        }
+    }
+
+    saveTODOItems();
+}
+
 function saveTODOItems():void
 {
     var todos:ArrayCollection<TODOItem> = todoStore.todos;
