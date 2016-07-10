@@ -3,9 +3,9 @@
 
 The purpose of this project is to showcase the capabilities of RamaJS Framework. 
 
-It is a Simple TODO app based of the [TodoMVC](http://todomvc.com/) guideline which helps developers to choose framework,
-based on the ease of implementation of exact same TODO application in different frameworks.
+It is a Simple TODO app based of the [TodoMVC](http://todomvc.com/) guideline which helps developers to choose framework, based on the ease of implementation of exact same TODO application in different frameworks.
 
+[Check out the demo](https://my-rama-todo.herokuapp.com/#/)
 
 ### Before we start
 
