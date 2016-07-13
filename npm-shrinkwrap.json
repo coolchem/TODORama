@@ -3203,9 +3203,9 @@
       "resolved": "https://registry.npmjs.org/qs/-/qs-5.2.0.tgz"
     },
     "ramajs": {
-      "version": "0.4.0",
+      "version": "0.4.2",
       "from": "ramajs@latest",
-      "resolved": "https://registry.npmjs.org/ramajs/-/ramajs-0.4.0.tgz"
+      "resolved": "https://registry.npmjs.org/ramajs/-/ramajs-0.4.2.tgz"
     },
     "randomatic": {
       "version": "1.1.5",
